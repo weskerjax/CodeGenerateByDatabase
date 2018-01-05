@@ -1,0 +1,166 @@
+﻿<#@ template language="C#" inherits="CodeGenerateByDatabase.Templates.TemplateBase" #>
+<#@ import namespace="CodeGenerateByDatabase.Models" #>
+<# 
+	string className = TableMeta.Name + "Controller";
+	FilePath = TableMeta.NameSpace + ".WebApp/Controllers/" + className + ".cs";
+#>
+using Orion.API;
+using Orion.API.Extensions;
+using Orion.API.Models;
+using Orion.Mvc.Attributes;
+using Orion.Mvc.Security;
+using Orion.Mvc.Extensions;
+
+using <#= TableMeta.NameSpace #>.Domain;
+using <#= TableMeta.NameSpace #>.Domain.Enums;
+using <#= TableMeta.NameSpace #>.WebApp.Models;
+using <#= TableMeta.NameSpace #>.Service;
+using System.Collections.Generic;
+using System.Web.Mvc;
+using System.Web;
+using System;
+
+
+
+namespace <#= TableMeta.NameSpace #>.WebApp.Controllers 
+{
+	/// <summary><#= TableMeta.Description #></summary>
+	//XXX [ActAuthorize(ACT.<#= TableMeta.Name #>View)]
+	public class <#= className #> : Controller 
+	{
+		private I<#= TableMeta.Name #>Service _<#= TableMeta.Variable #>Service;
+
+		private int _userId = -1;
+
+
+		public <#= className #>(I<#= TableMeta.Name #>Service <#= TableMeta.Variable #>Service)
+		{
+			_<#= TableMeta.Variable #>Service = <#= TableMeta.Variable #>Service;
+
+		}
+
+		
+		protected override void OnActionExecuting(ActionExecutingContext filterContext)
+		{
+			_userId = User.Identity.GetUserId();
+		}
+
+		protected override void OnActionExecuted(ActionExecutedContext filterContext)
+		{
+		}
+
+
+
+
+		private <#= TableMeta.Name #>Domain toDomain(<#= TableMeta.Name #>ViewModel vm)
+		{
+			if(vm  == null) { return null; }
+
+			var domain = new <#= TableMeta.Name #>Domain 
+			{
+<# foreach(var col in TableMeta.Columns) { #>
+				<#= col.Name #> = vm.<#= col.Name #>,
+<# } #>
+			};			
+			domain.ModifyBy = _userId;
+
+			return domain;
+		}
+
+
+
+
+		public ActionResult Index()
+		{
+			return RedirectToAction(nameof(List));
+		}
+
+
+
+
+
+		public ActionResult List(WhereParams<<#= TableMeta.Name #>Domain> findParam, PageParams<<#= TableMeta.Name #>Sort?> pageParams)
+		{
+			Pagination<<#= TableMeta.Name #>Domain> domainPage = _<#= TableMeta.Variable #>Service.GetPagination(findParam, pageParams);
+			ViewBag.Pagination = domainPage;
+
+			return View();
+		}
+
+
+
+		public ActionResult Export(WhereParams<<#= TableMeta.Name #>Domain> findParam)
+		{
+			Pagination<<#= TableMeta.Name #>Domain> domainPage = _<#= TableMeta.Variable #>Service.GetPagination(findParam, null);
+			ViewBag.Pagination = domainPage;
+
+			return this.ExcelView($"<#= TableMeta.Description #>-{DateTime.Now:yyyyMMddHHmmss}.xls");
+		}
+
+
+
+
+		[HttpGet]
+		[UseViewPage("Form")]
+		//XXX [ActAuthorize(ACT.<#= TableMeta.Name #>Edit)]
+		public ActionResult Create()
+		{
+			var vm = new <#= TableMeta.Name #>ViewModel
+			{
+				//TODO
+			};
+
+			return View(vm);
+		}
+
+
+		[HttpPost]
+		[UseViewPage("Form")]
+		//XXX [ActAuthorize(ACT.<#= TableMeta.Name #>Edit)]
+		public ActionResult Create(<#= TableMeta.Name #>ViewModel vm)
+		{
+			if (!ModelState.IsValid) { return View(vm); }
+
+			var domain = toDomain(vm);
+			<#= TableMeta.PK.CodeType #> <#= TableMeta.PK.Variable #> = _<#= TableMeta.Variable #>Service.Save(domain);
+			this.SetStatusSuccess("儲存成功!!");
+			return RedirectToAction(nameof(Edit), new { <#= TableMeta.PK.Variable #> });
+		}
+
+
+
+
+
+
+		[HttpGet]
+		[UseViewPage("Form")]
+		public ActionResult Edit(<#= TableMeta.PK.CodeType #> <#= TableMeta.PK.Variable #>)
+		{
+			<#= TableMeta.Name #>Domain domain = _<#= TableMeta.Variable #>Service.GetById(<#= TableMeta.PK.Variable #>);
+
+			var vm = new <#= TableMeta.Name #>ViewModel 
+			{
+<# foreach(var col in TableMeta.Columns) { #>
+				<#= col.Name #> = domain.<#= col.Name #>,
+<# } #>
+			};		
+
+			return View(vm);
+		}
+
+		[HttpPost]
+		[UseViewPage("Form")]
+		//XXX [ActAuthorize(ACT.<#= TableMeta.Name #>Edit)]
+		public ActionResult Edit(<#= TableMeta.Name #>ViewModel vm)
+		{
+			if (!ModelState.IsValid) { return View(vm); }
+
+			var domain = toDomain(vm);
+			<#= TableMeta.PK.CodeType #> <#= TableMeta.PK.Variable #> = _<#= TableMeta.Variable #>Service.Save(domain);            
+			this.SetStatusSuccess("儲存成功!!");
+			return RedirectToAction(nameof(Edit), new { <#= TableMeta.PK.Variable #> });
+		}
+
+
+	}
+}

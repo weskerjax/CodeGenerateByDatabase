@@ -1,0 +1,25 @@
+﻿<#@ template language="C#" inherits="CodeGenerateByDatabase.Templates.TemplateBase" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="CodeGenerateByDatabase.Models" #>
+<# 
+	string className = TableMeta.Name + "Sort";
+	FilePath = TableMeta.NameSpace + ".Domain/Enums/" + className + ".cs";
+#>
+using System.ComponentModel.DataAnnotations;
+
+namespace <#= TableMeta.NameSpace #>.Domain.Enums 
+{
+	/// <summary><#= TableMeta.Description #> 排序</summary>
+	public enum <#= className #> 
+	{
+		//TODO 程式產生未完成
+		<# foreach(var col in TableMeta.Columns) { #>
+
+		/// <summary><#= col.Description #></summary>
+		[Display(Name = "<#= col.Description #>")]
+		<#= col.Name #>,
+		<# } #>
+
+	}
+
+}

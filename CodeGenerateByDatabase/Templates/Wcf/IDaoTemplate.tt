@@ -1,0 +1,34 @@
+﻿<#@ template language="C#" inherits="CodeGenerateByDatabase.Templates.TemplateBase" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="CodeGenerateByDatabase.Models" #>
+<# 
+	string className = "I" + TableMeta.Name + "Dao";
+	FilePath = TableMeta.NameSpace + ".Dao/" + className + ".cs";
+#>
+using Orion.API.Models;
+using <#= TableMeta.NameSpace #>.Domain;
+using <#= TableMeta.NameSpace #>.Domain.Enums;
+using System.Collections.Generic;
+
+
+namespace <#= TableMeta.NameSpace #>.Dao
+{
+	/// <summary><#= TableMeta.Description #></summary>
+	public interface <#= className #>
+	{
+		//TODO 程式產生未完成
+		//Dictionary<int, string> GetDic(string status = null);
+
+		//TODO 程式產生未完成
+		//Dictionary<string, string> GetStatusItems();
+
+		Pagination<<#= TableMeta.Name #>Domain> GetPagination(WhereParams<<#= TableMeta.Name #>Domain> findParam, PageParams<<#= TableMeta.Name #>Sort?> pageParams);
+
+		//TODO 程式產生未完成
+		//List<<#= TableMeta.Name #>Domain> GetList(WhereParams<<#= TableMeta.Name #>Domain> findParam = null);
+		
+		<#= TableMeta.Name #>Domain GetById(<#= TableMeta.PK.CodeType #> <#= TableMeta.PK.Variable #>);
+		
+		int Save(<#= TableMeta.Name #>Domain domain);
+	}
+}

@@ -1,0 +1,78 @@
+﻿<#@ template language="C#" inherits="CodeGenerateByDatabase.Templates.TemplateBase" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="CodeGenerateByDatabase.Models" #>
+<# 
+	string className = TableMeta.Name + "Service";
+	FilePath = TableMeta.NameSpace + ".Service.Impl/" + className + ".cs";
+#>
+using Orion.API;
+using Orion.API.Models;
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using <#= TableMeta.NameSpace #>.Dao;
+using <#= TableMeta.NameSpace #>.Domain;
+using <#= TableMeta.NameSpace #>.Domain.Enums;
+
+
+namespace <#= TableMeta.NameSpace #>.Service.Impl
+{
+	/// <summary><#= TableMeta.Description #></summary>
+	public class <#= className #> : I<#= className #>
+	{
+		private I<#= TableMeta.Name #>Dao _<#= TableMeta.Variable #>Dao;
+
+		public <#= className #>(I<#= TableMeta.Name #>Dao <#= TableMeta.Variable #>Dao)
+		{
+			_<#= TableMeta.Variable #>Dao = <#= TableMeta.Variable #>Dao;
+		}
+
+
+		//TODO 程式產生未完成
+		//public Dictionary<int, string> GetDic(string status)
+		//{
+		//    return _<#= TableMeta.Variable #>Dao.GetDic(status);
+		//}
+
+
+		//TODO 程式產生未完成
+		//public Dictionary<string, string> GetStatusItems()
+		//{
+		//    return _<#= TableMeta.Variable #>Dao.GetStatusItems();
+		//}
+
+
+		public Pagination<<#= TableMeta.Name #>Domain> GetPagination(WhereParams<<#= TableMeta.Name #>Domain> findParam, PageParams<<#= TableMeta.Name #>Sort?> pageParams)
+		{
+			return _<#= TableMeta.Variable #>Dao.GetPagination(findParam, pageParams);
+		}
+
+
+		//TODO 程式產生未完成
+		//public List<<#= TableMeta.Name #>Domain> GetList(WhereParams<<#= TableMeta.Name #>Domain> findParam)
+		//{
+		//    return _<#= TableMeta.Variable #>Dao.GetList(findParam);
+		//}
+
+
+		public <#= TableMeta.Name #>Domain GetById(<#= TableMeta.PK.CodeType #> <#= TableMeta.PK.Variable #>)
+		{
+			var domain = _<#= TableMeta.Variable #>Dao.GetById(<#= TableMeta.PK.Variable #>);
+			Checker.Has(domain, "<#= TableMeta.Description #>資料不存在");
+
+			return domain;
+		}
+
+
+		//TODO 程式產生未完成
+		public int Save(<#= TableMeta.Name #>Domain domain)
+		{
+<# foreach(var col in TableMeta.Columns.Where(x => x.CodeType != "bool")) { #>		
+			Checker.Has(domain.<#= col.Name #>, "<#= col.Description #>不可以為空");
+<# } #>
+
+			return _<#= TableMeta.Variable #>Dao.Save(domain);
+		}
+
+	}
+}

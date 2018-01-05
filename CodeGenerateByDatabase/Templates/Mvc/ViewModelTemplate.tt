@@ -1,0 +1,30 @@
+﻿<#@ template language="C#" inherits="CodeGenerateByDatabase.Templates.TemplateBase" #>
+<#@ import namespace="CodeGenerateByDatabase.Models" #>
+<# 
+	string className = TableMeta.Name + "ViewModel";
+	FilePath = TableMeta.NameSpace + ".WebApp/Models/" + className + ".cs";
+#>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.ComponentModel.DataAnnotations;
+using System.Text;
+
+namespace <#= TableMeta.NameSpace #>.WebApp.Models 
+{
+	/// <summary><#= TableMeta.Description #></summary>
+	public class <#= className #> 
+	{
+		<# foreach(var col in TableMeta.Columns) { #>
+
+		/// <summary><#= col.Description #></summary>
+<# if(!col.IsNullable){ #>
+		[Required]
+<# } #>
+		[Display(Name = "<#= col.Description #>")]
+		public <#= col.CodeType #> <#= col.Name #> { get; set; }
+		<# } #>
+
+	}
+}

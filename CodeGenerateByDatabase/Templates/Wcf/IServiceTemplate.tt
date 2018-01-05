@@ -1,0 +1,44 @@
+﻿<#@ template language="C#" inherits="CodeGenerateByDatabase.Templates.TemplateBase" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="CodeGenerateByDatabase.Models" #>
+<# 
+	string className = "I" + TableMeta.Name + "Service";
+	FilePath = TableMeta.NameSpace + ".Service/" + className + ".cs";
+#>
+using Orion.API.Models;
+using System.Collections.Generic;
+using System.ServiceModel;
+using <#= TableMeta.NameSpace #>.Domain;
+using <#= TableMeta.NameSpace #>.Domain.Enums;
+
+
+namespace <#= TableMeta.NameSpace #>.Service
+{
+	/// <summary><#= TableMeta.Description #></summary>
+	[ServiceContract]
+	public interface <#= className #>
+	{
+		//TODO 程式產生未完成
+		//[OperationContract]
+		//Dictionary<int, string> GetDic(string status);
+		
+		//TODO 程式產生未完成
+		//[OperationContract]
+		//Dictionary<string, string> GetStatusItems();
+
+		[OperationContract]
+		Pagination<<#= TableMeta.Name #>Domain> GetPagination(WhereParams<<#= TableMeta.Name #>Domain> findParam, PageParams<<#= TableMeta.Name #>Sort?> pageParams);
+		
+		//TODO 程式產生未完成
+		//[OperationContract]
+		//List<<#= TableMeta.Name #>Domain> GetList(WhereParams<<#= TableMeta.Name #>Domain> findParam);
+
+		[OperationContract]
+		<#= TableMeta.Name #>Domain GetById(<#= TableMeta.PK.CodeType #> <#= TableMeta.PK.Variable #>);
+		
+		[OperationContract]
+		int Save(<#= TableMeta.Name #>Domain domain);
+
+
+	}
+}

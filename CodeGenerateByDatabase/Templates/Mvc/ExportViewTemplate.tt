@@ -1,0 +1,33 @@
+﻿<#@ template language="C#" inherits="CodeGenerateByDatabase.Templates.TemplateBase" #>
+<#@ import namespace="CodeGenerateByDatabase.Models" #>
+<# 
+	FilePath = TableMeta.NameSpace + ".WebApp/Views/" + TableMeta.Name + "/Export.cshtml";
+#>
+@{
+	Layout = "~/Views/shared/_ExcelLayout.cshtml";
+	ViewBag.Title = "<#= TableMeta.Description #>列表";
+
+	string thStyle = "color: #fff; background: #2d6da3;";
+
+
+	Dictionary<int, string> userNameItems = ViewBag.UserNameItems; 
+	Pagination<<#= TableMeta.Name #>Domain> pagination = ViewBag.Pagination;
+}
+
+
+<table>
+	<tr>
+<# foreach(var col in TableMeta.Columns) { #>
+		<td style="@thStyle"><#= col.Description #></td>
+<# } #>
+	</tr>
+
+	@foreach (var row in pagination.List)
+	{
+		<tr>
+<# foreach(var col in TableMeta.Columns) { #>
+			<td>@row.<#= col.Name #></td>
+<# } #>
+		</tr>
+	}
+</table>

@@ -1,0 +1,64 @@
+﻿<#@ template language="C#" inherits="CodeGenerateByDatabase.Templates.TemplateBase" #>
+<#@ import namespace="CodeGenerateByDatabase.Models" #>
+<# 
+	FilePath = TableMeta.NameSpace + ".WebApp/Views/" + TableMeta.Name + "/Dialog.cshtml";
+#>
+@model <#= TableMeta.Name #>ViewModel
+
+
+@{
+	Layout = "~/Views/shared/_DialogLayout.cshtml";
+
+	bool isCreate = Model.<#= TableMeta.PK.Name #> == 0;
+	
+	ViewBag.Title = isCreate ? "新增<#= TableMeta.Description #>" : "編輯<#= TableMeta.Description #>";
+}
+
+@section Styles {
+}
+
+
+@section Scripts {
+	<script type="text/javascript">
+		Dialog.resize(700, 500);
+	</script>
+}
+
+@if (TempData.ContainsKey("StatusSuccess"))
+{
+	<script type="text/javascript">Dialog.close(200);</script> 
+}
+
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new
+{
+	action = "",
+	@class = "form-horizontal form-sm",
+	ext_one_submit = "",
+	ext_exit_alert = "資料尚未儲存，確定要離開？",
+}))
+{
+	@Html.HiddenFor(m => m.<#= TableMeta.PK.Name #>)
+	
+	<div class="modal-header">
+		<h4 class="modal-title">@ViewBag.Title</h4>
+	</div>
+
+	<div class="modal-body auto">
+<# foreach(var col in TableMeta.Columns) { #>
+		<div class="form-group col-xs-6">
+			@Html.BsLabelFor(m => m.<#= col.Name #>, new { @class = "col-xs-4" })
+			<div class="col-xs-8">
+				@Html.BsTextBoxFor(m => m.<#= col.Name #>)
+				<span class="form-tip">@Html.ValidationMessageFor(m => m.<#= col.Name #>)</span>
+			</div>
+		</div>
+<# } #>
+	</div>
+
+	<div class="modal-footer">
+		<span class="btn btn-default" data-dismiss="modal"><i class="fa fa-times fa-lg"></i> 關閉</span>
+		<button type="submit" class="btn btn-primary"><i class="fa fa-save fa-lg"></i> 儲存</button>
+	</div>
+}
+

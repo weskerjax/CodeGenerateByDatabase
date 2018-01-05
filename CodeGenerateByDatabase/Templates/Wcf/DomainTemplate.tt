@@ -1,0 +1,23 @@
+﻿<#@ template language="C#" inherits="CodeGenerateByDatabase.Templates.TemplateBase" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="CodeGenerateByDatabase.Models" #>
+<# 
+	string className = TableMeta.Name + "Domain";
+	FilePath = TableMeta.NameSpace + ".Domain/" + className + ".cs";
+#>
+using System;
+
+
+namespace <#= TableMeta.NameSpace #>.Domain 
+{
+	/// <summary><#= TableMeta.Description #></summary>
+	public class <#= className #> 
+	{
+		<# foreach(var col in TableMeta.Columns) { #>
+
+		/// <summary><#= col.Description #></summary>
+		public <#= col.CodeType #> <#= col.Name #> { get; set; }
+		<# } #>
+
+	}
+}
